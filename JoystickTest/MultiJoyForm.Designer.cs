@@ -28,20 +28,33 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.panelScroll = new System.Windows.Forms.Panel();
             this.SuspendLayout();
             // 
-            // Form1
+            // panelScroll
+            // 
+            this.panelScroll.AutoScroll = true;
+            this.panelScroll.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panelScroll.Location = new System.Drawing.Point(0, 0);
+            this.panelScroll.Name = "panelScroll";
+            this.panelScroll.Size = new System.Drawing.Size(984, 533);
+            this.panelScroll.TabIndex = 0;
+            // 
+            // MultiJoyForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(851, 252);
-            this.Name = "Form1";
+            this.ClientSize = new System.Drawing.Size(984, 533);
+            this.Controls.Add(this.panelScroll);
+            this.Name = "MultiJoyForm";
             this.Text = "Multi Joy Tester";
             this.ResumeLayout(false);
 
         }
 
         #endregion
+
+        private System.Windows.Forms.Panel panelScroll;
     }
 }
 

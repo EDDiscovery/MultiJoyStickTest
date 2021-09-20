@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright © 2017 RJP MultiJoy
+ * Copyright © 2021 RJP MultiJoy robbyxp1 @ github.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this
  * file except in compliance with the License. You may obtain a copy of the License at
@@ -16,12 +16,7 @@
 using SharpDX.DirectInput;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace JoystickTest
@@ -30,25 +25,39 @@ namespace JoystickTest
     {
         Timer t = new Timer();
         List<JoyUC> juc = new List<JoyUC>();
+        int nodevices = 0;
+        int checknewcounter = 0;
+        DirectInput dinput;
 
         public MultiJoyForm()
         {
             InitializeComponent();
+            dinput = new DirectInput();
+            Scan();
+        }
+
+        private void Scan()
+        {
+            t.Stop();
+            juc.Clear();
 
             int voff = 10;
-            DirectInput dinput = new DirectInput();
+            var devices = dinput.GetDevices(DeviceClass.GameControl, DeviceEnumerationFlags.AttachedOnly);
+            nodevices = devices.Count;
 
-            foreach (DeviceInstance di in dinput.GetDevices(DeviceClass.GameControl, DeviceEnumerationFlags.AttachedOnly))
+            int controlswidth = 600;
+
+            foreach (DeviceInstance di in devices)
             {
                 bool doit = true;
-               // doit = (di.InstanceName.Contains("Thrustmaster")) || (di.InstanceName.Contains("16000"));
-               
+                // doit = (di.InstanceName.Contains("Thrustmaster")) || (di.InstanceName.Contains("16000"));
+
                 if (doit)
                 {
-                    System.Diagnostics.Debug.WriteLine("{0} {1}", di.InstanceGuid, di.InstanceName);
+                    System.Diagnostics.Debug.WriteLine("Detected {0} {1}", di.InstanceGuid, di.InstanceName.RemoveNuls());
 
                     JoyUC j = new JoyUC();
-                    j.Width = ClientRectangle.Width - 10;
+                    //j.Width = ClientRectangle.Width - 10;
                     int h = j.Init(dinput, di);
 
                     if (h != 0)
@@ -56,25 +65,45 @@ namespace JoystickTest
                         j.Height = h;
                         j.Location = new Point(5, voff);
                         voff += j.Height + 10;
-                        this.Controls.Add(j);
+                        panelScroll.Controls.Add(j);
                         juc.Add(j);
+                        controlswidth = Math.Max(j.Right, controlswidth);
                     }
                 }
 
                 PerformLayout();
             }
 
-            this.Size = new Size(this.Width, voff + 50);
+            this.Size = new Size(controlswidth+50, Math.Min(1000,voff + 50));
             t.Interval = 100;
             t.Tick += T_Tick;
             t.Start();
+
         }
 
         private void T_Tick(object sender, EventArgs e)
         {
+            bool stickerror = false;
             foreach (JoyUC ju in juc)
-                ju.CheckStick();
+            {
+                if (!ju.CheckStick())
+                {
+                    stickerror = true;
+                    break;
+                }
+            }
            
+            if ( stickerror || ++checknewcounter % 20 == 0)
+            {
+                var devices = dinput.GetDevices(DeviceClass.GameControl, DeviceEnumerationFlags.AttachedOnly);
+                if ( devices.Count != nodevices)
+                {
+                    System.Diagnostics.Debug.WriteLine("New/deleted device");
+                    panelScroll.Controls.Clear();
+                    Scan();
+                }
+
+            }
         }
     }
 }
