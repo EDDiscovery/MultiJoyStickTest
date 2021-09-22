@@ -32,6 +32,7 @@ namespace JoystickTest
         public MultiJoyForm()
         {
             InitializeComponent();
+            this.Icon = Properties.Resources.joystick_icon;
             dinput = new DirectInput();
             Scan();
         }

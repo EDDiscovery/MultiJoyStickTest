@@ -33,8 +33,10 @@ namespace JoystickTest
         Joystick stick;
         RadioButton[] rb;
         int povcount;
+        int[] povstate;
         int butcount;
         int slidercount;
+        string stickname;
 
         public int Init(DirectInput pdinput, DeviceInstance di)
         {
@@ -51,10 +53,12 @@ namespace JoystickTest
             labelX.Visible = labelY.Visible = labelZ.Visible =
             labelRX.Visible = labelRY.Visible = labelRZ.Visible =
             labelS1.Visible = labelS2.Visible = false;
-            povBox.Visible = false;
+            povBox1.Visible = povBox2.Visible = false;
 
             try
             {
+                stickname = di.InstanceName.RemoveNuls();
+
                 stick = new SharpDX.DirectInput.Joystick(dinput, di.InstanceGuid);
                 stick.Acquire();
 
@@ -66,13 +70,13 @@ namespace JoystickTest
 
                 DeviceProperties p = stick.Properties;
 
-                groupBox1.Text = di.InstanceName.Substring(0,di.InstanceName.IndexOf('\0')) + " : " + p.VendorId.ToString("X4") + p.ProductId.ToString("X4");
+                groupBox1.Text = stickname.Substring(0,di.InstanceName.IndexOf('\0')) + " : " + p.VendorId.ToString("X4") + p.ProductId.ToString("X4");
 
                 System.Diagnostics.Debug.WriteLine("  ax {0} but {1} pov {2} vid {3:X} pid {4:X}", c.AxeCount, c.ButtonCount, c.PovCount, p.VendorId, p.ProductId);
 
-                if (!di.InstanceName.RemoveNuls().Contains("16000"))
+                if (!stickname.Contains("CH"))
                 {
-                //    return 0;
+                   // return 0;
 
                 }
 
@@ -139,12 +143,17 @@ namespace JoystickTest
                 List<Control> tracks = new List<Control>() { trackBarX, trackBarY, trackBarZ, trackBarS1, trackBarRX, trackBarRY, trackBarRZ, trackBarS2};
                 int maxtrackvisible = tracks.Where(w => w.Visible).Select(x => x.Bottom).Max();     // find bottom of all tracks
 
-                if ( c.PovCount>0 )
-                    povBox.Visible = true;
+                povBox1.Top = povBox2.Top = maxtrackvisible + 4;
 
-                extraInfoBox.Top = povBox.Top = maxtrackvisible + 4;
+                if (povcount > 0)
+                {
+                    povstate = new int[povcount];
+                    povBox1.Visible = true;
+                }
+                if (povcount > 1)
+                    povBox2.Visible = true;
 
-                int hbase = extraInfoBox.Bottom+4;
+                int hbase = (povBox1.Visible || povBox2.Visible) ? povBox1.Bottom+4 : maxtrackvisible+4;
 
                 for (int i = 0; i < butcount; i++ )
                 {
@@ -167,66 +176,106 @@ namespace JoystickTest
             catch
             {
                 return 0;
-
             }
 
         }
 
         public bool CheckStick()
         {
-            //System.Diagnostics.Debug.WriteLine("Check stick " + stick.Properties.InstanceName);
+            //System.Diagnostics.Debug.WriteLine("Check stick " + stick.Properties.InstanceName.RemoveNuls());
 
             try
             {
                 JoystickState js = stick.GetCurrentState();
 
+                int refresh = 0;        // non zero force refresh - seen the display lag. number indicates reason for debugging
+
                 bool[] buttons = js.Buttons;
 
                 for (int i = 0; i < butcount; i++)
                 {
-                    rb[i].Checked = buttons[i];
+                    if (rb[i].Checked != buttons[i])
+                    {
+                        rb[i].Checked = buttons[i];
+                        refresh = 100+i;
+                    }
                 }
 
                 if (trackBarX.Value != js.X)
+                {
+                    System.Diagnostics.Debug.WriteLine(stickname + " X " + trackBarX.Value + " " + js.X);
                     trackBarX.Value = js.X;
+                    refresh = 1;
+                }
                 if (trackBarY.Value != js.Y)
+                {
+                    //System.Diagnostics.Debug.WriteLine(stickname + " Y " + trackBarY.Value + " " + js.Y);
                     trackBarY.Value = js.Y;
+                    refresh = 2;
+                }
                 if (trackBarZ.Value != js.Z)
+                {
+                    //System.Diagnostics.Debug.WriteLine(stickname + " Z " + trackBarZ.Value + " " + js.Z);
                     trackBarZ.Value = js.Z;
+                    refresh = 3;
+                }
                 if (trackBarRX.Value != js.RotationX)
+                {
                     trackBarRX.Value = js.RotationX;
+                    refresh = 4;
+                }
                 if (trackBarRY.Value != js.RotationY)
+                {
                     trackBarRY.Value = js.RotationY;
+                    refresh = 5;
+                }
                 if (trackBarRZ.Value != js.RotationZ)
+                {
                     trackBarRZ.Value = js.RotationZ;
+                    refresh = 6;
+                }
 
                 int[] sliders = js.Sliders;
-                if (sliders.Length > 0)
+                if (sliders.Length > 0 && trackBarS1.Value != sliders[0])
                 {
                     trackBarS1.Value = sliders[0];
-
-                    if (sliders.Length > 1)
-                        trackBarS2.Value = sliders[1];
+                    refresh = 7;
+                }
+                if (sliders.Length > 1 && trackBarS2.Value != sliders[1])
+                {
+                    trackBarS2.Value = sliders[1];
+                    refresh = 8;
                 }
 
                 int[] pov = js.PointOfViewControllers;
-                string s = "POV ";
-                for (int p = 0; p < povcount; p++)
-                {
-                    s += (p + 1) + ":";
 
-                    if (pov[p] < 0)
-                        s += "Not Pressed ";
-                    else
-                        s += (pov[0] / 100) + " degrees ";
+                for (int p = 0; p < povcount && p < 2; p++)
+                {
+                    if (povstate[p] != pov[p])
+                    {
+                        povstate[p] = pov[p];
+
+                        string s = "POV" + (p+1) + ":";
+
+                        if (pov[p] < 0)
+                            s += "Not Pressed ";
+                        else
+                            s += (pov[p] / 100) + " degrees ";
+
+                        if (p == 0)
+                            povBox1.Text = s;
+                        else
+                            povBox2.Text = s;
+
+                        refresh = 200+p;
+                    }
                 }
 
-                povBox.Text = s;
-
-                extraInfoBox.Text = "";
-
-                for (int i = 2; i < sliders.Length; i++)
-                    extraInfoBox.Text += "," + sliders[i];
+                if (refresh!=0)
+                {
+                  //  System.Diagnostics.Debug.WriteLine($"{stickname} refresh {refresh}");
+                    Refresh();
+                }
 
                 return true;
             }

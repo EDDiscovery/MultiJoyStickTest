@@ -47,7 +47,7 @@
             this.ClientSize = new System.Drawing.Size(984, 533);
             this.Controls.Add(this.panelScroll);
             this.Name = "MultiJoyForm";
-            this.Text = "Multi Joy Tester";
+            this.Text = "MultiJoystick Tester";
             this.ResumeLayout(false);
 
         }
