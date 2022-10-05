@@ -14,6 +14,7 @@
  */
 
 using SharpDX.DirectInput;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
@@ -74,44 +75,46 @@ namespace JoystickTest
 
                 System.Diagnostics.Debug.WriteLine("  ax {0} but {1} pov {2} vid {3:X} pid {4:X}", c.AxeCount, c.ButtonCount, c.PovCount, p.VendorId, p.ProductId);
 
-                if (!stickname.Contains("CH"))
-                {
-                   // return 0;
+                var objects = stick.GetObjects();
 
-                }
+                //povcount = 0; objects = null; // to check it works like this
 
-                foreach (DeviceObjectInstance deviceObject in stick.GetObjects())
+
+                if (objects != null)
                 {
-                    if ((deviceObject.ObjectId.Flags & DeviceObjectTypeFlags.Axis) != 0)
+                    foreach (DeviceObjectInstance deviceObject in objects)
                     {
-                        System.Guid guid = deviceObject.ObjectType;
-                        System.Diagnostics.Debug.WriteLine("  {0} {1} {2} {3} {4}" , deviceObject.Name.RemoveNuls(), deviceObject.UsagePage, deviceObject.Usage, deviceObject.Offset , guid.ToString().RemoveNuls());
+                        if ((deviceObject.ObjectId.Flags & DeviceObjectTypeFlags.Axis) != 0)
+                        {
+                            System.Guid guid = deviceObject.ObjectType;
+                            System.Diagnostics.Debug.WriteLine("  {0} {1} {2} {3} {4}", deviceObject.Name.RemoveNuls(), deviceObject.UsagePage, deviceObject.Usage, deviceObject.Offset, guid.ToString().RemoveNuls());
 
-                        if (guid == ObjectGuid.XAxis)
-                            labelX.Visible = trackBarX.Visible = true;
-                        else if (guid == ObjectGuid.YAxis)
-                            labelY.Visible = trackBarY.Visible = true;
-                        else if (guid == ObjectGuid.ZAxis)
-                            labelZ.Visible = trackBarZ.Visible = true;
-                        else if (guid == ObjectGuid.RxAxis)       
-                            labelRX.Visible = trackBarRX.Visible = true;
-                        else if (guid == ObjectGuid.RyAxis)       
-                            labelRY.Visible = trackBarRY.Visible = true;
-                        else if (guid == ObjectGuid.RzAxis)
-                            labelRZ.Visible = trackBarRZ.Visible = true;
-                        else if ( guid == ObjectGuid.Slider )
-                        {                                                   
-                            if ( slidercount == 0 )
-                                labelS1.Visible = trackBarS1.Visible = true; // labelS2.Visible = trackBarS2.Visible = true;
-                            else if ( slidercount == 1)
-                                labelS2.Visible = trackBarS2.Visible = true;
+                            if (guid == ObjectGuid.XAxis)
+                                labelX.Visible = trackBarX.Visible = true;
+                            else if (guid == ObjectGuid.YAxis)
+                                labelY.Visible = trackBarY.Visible = true;
+                            else if (guid == ObjectGuid.ZAxis)
+                                labelZ.Visible = trackBarZ.Visible = true;
+                            else if (guid == ObjectGuid.RxAxis)
+                                labelRX.Visible = trackBarRX.Visible = true;
+                            else if (guid == ObjectGuid.RyAxis)
+                                labelRY.Visible = trackBarRY.Visible = true;
+                            else if (guid == ObjectGuid.RzAxis)
+                                labelRZ.Visible = trackBarRZ.Visible = true;
+                            else if (guid == ObjectGuid.Slider)
+                            {
+                                if (slidercount == 0)
+                                    labelS1.Visible = trackBarS1.Visible = true; // labelS2.Visible = trackBarS2.Visible = true;
+                                else if (slidercount == 1)
+                                    labelS2.Visible = trackBarS2.Visible = true;
 
-                            slidercount++;      // 3 on shown as numbers                
+                                slidercount++;      // 3 on shown as numbers                
+                            }
+
+                            ObjectProperties o = stick.GetObjectPropertiesById(deviceObject.ObjectId);
+                            //System.Diagnostics.Debug.WriteLine("  L" + o.LowerRange + " U" + o.UpperRange + " G" + o.Granularity + " D" + o.DeadZone + " Il" + o.LogicalRange.Minimum + " Iu" + o.LogicalRange.Maximum);
+                            o.Range = new InputRange(min, max);
                         }
-
-                        ObjectProperties o = stick.GetObjectPropertiesById(deviceObject.ObjectId);
-                        //System.Diagnostics.Debug.WriteLine("  L" + o.LowerRange + " U" + o.UpperRange + " G" + o.Granularity + " D" + o.DeadZone + " Il" + o.LogicalRange.Minimum + " Iu" + o.LogicalRange.Maximum);
-                        o.Range = new InputRange(min, max);
                     }
                 }
 
@@ -141,7 +144,9 @@ namespace JoystickTest
                 }
 
                 List<Control> tracks = new List<Control>() { trackBarX, trackBarY, trackBarZ, trackBarS1, trackBarRX, trackBarRY, trackBarRZ, trackBarS2};
-                int maxtrackvisible = tracks.Where(w => w.Visible).Select(x => x.Bottom).Max();     // find bottom of all tracks
+
+                var visible = tracks.Where(w => w.Visible).ToList();
+                int maxtrackvisible = visible.Count>0 ? visible.Select(x => x.Bottom).Max() : 20;     // find bottom of all tracks
 
                 povBox1.Top = povBox2.Top = maxtrackvisible + 4;
 
@@ -161,6 +166,7 @@ namespace JoystickTest
                     p1.Location = new Point((i%16) * 50 + 5, hbase + 20 * (i/16));
                     p1.Size = new Size(50, 20);
                     RadioButton r = new RadioButton();
+                    r.ForeColor = System.Drawing.SystemColors.WindowText;
                     r.Location = new Point(1, 5);
                     r.AutoSize = true;
                     r.Size = new Size(85, 18);
@@ -173,8 +179,9 @@ namespace JoystickTest
                 return hbase + 16 + 20 * ((butcount+15) / 16);  // size of UC.. include space for groupbox
 
             }
-            catch
+            catch( Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine($"Exception in device setup {ex}");
                 return 0;
             }
 

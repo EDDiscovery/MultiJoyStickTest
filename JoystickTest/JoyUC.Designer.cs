@@ -37,6 +37,7 @@
             this.labelY = new System.Windows.Forms.Label();
             this.labelRX = new System.Windows.Forms.Label();
             this.labelX = new System.Windows.Forms.Label();
+            this.povBox2 = new System.Windows.Forms.TextBox();
             this.povBox1 = new System.Windows.Forms.TextBox();
             this.trackBarS2 = new System.Windows.Forms.TrackBar();
             this.trackBarS1 = new System.Windows.Forms.TrackBar();
@@ -46,7 +47,6 @@
             this.trackBarRX = new System.Windows.Forms.TrackBar();
             this.trackBarY = new System.Windows.Forms.TrackBar();
             this.trackBarX = new System.Windows.Forms.TrackBar();
-            this.povBox2 = new System.Windows.Forms.TextBox();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarS2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarS1)).BeginInit();
@@ -79,6 +79,7 @@
             this.groupBox1.Controls.Add(this.trackBarY);
             this.groupBox1.Controls.Add(this.trackBarX);
             this.groupBox1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.groupBox1.ForeColor = System.Drawing.Color.DarkRed;
             this.groupBox1.Location = new System.Drawing.Point(0, 0);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(908, 517);
@@ -89,6 +90,7 @@
             // labelS2
             // 
             this.labelS2.AutoSize = true;
+            this.labelS2.ForeColor = System.Drawing.SystemColors.WindowText;
             this.labelS2.Location = new System.Drawing.Point(700, 80);
             this.labelS2.Name = "labelS2";
             this.labelS2.Size = new System.Drawing.Size(20, 13);
@@ -98,6 +100,7 @@
             // labelS1
             // 
             this.labelS1.AutoSize = true;
+            this.labelS1.ForeColor = System.Drawing.SystemColors.WindowText;
             this.labelS1.Location = new System.Drawing.Point(700, 15);
             this.labelS1.Name = "labelS1";
             this.labelS1.Size = new System.Drawing.Size(20, 13);
@@ -107,6 +110,7 @@
             // labelRZ
             // 
             this.labelRZ.AutoSize = true;
+            this.labelRZ.ForeColor = System.Drawing.SystemColors.WindowText;
             this.labelRZ.Location = new System.Drawing.Point(500, 80);
             this.labelRZ.Name = "labelRZ";
             this.labelRZ.Size = new System.Drawing.Size(22, 13);
@@ -116,6 +120,7 @@
             // labelZ
             // 
             this.labelZ.AutoSize = true;
+            this.labelZ.ForeColor = System.Drawing.SystemColors.WindowText;
             this.labelZ.Location = new System.Drawing.Point(504, 15);
             this.labelZ.Name = "labelZ";
             this.labelZ.Size = new System.Drawing.Size(14, 13);
@@ -125,6 +130,7 @@
             // labelRY
             // 
             this.labelRY.AutoSize = true;
+            this.labelRY.ForeColor = System.Drawing.SystemColors.WindowText;
             this.labelRY.Location = new System.Drawing.Point(300, 80);
             this.labelRY.Name = "labelRY";
             this.labelRY.Size = new System.Drawing.Size(22, 13);
@@ -134,6 +140,7 @@
             // labelY
             // 
             this.labelY.AutoSize = true;
+            this.labelY.ForeColor = System.Drawing.SystemColors.WindowText;
             this.labelY.Location = new System.Drawing.Point(304, 15);
             this.labelY.Name = "labelY";
             this.labelY.Size = new System.Drawing.Size(14, 13);
@@ -143,6 +150,7 @@
             // labelRX
             // 
             this.labelRX.AutoSize = true;
+            this.labelRX.ForeColor = System.Drawing.SystemColors.WindowText;
             this.labelRX.Location = new System.Drawing.Point(100, 80);
             this.labelRX.Name = "labelRX";
             this.labelRX.Size = new System.Drawing.Size(22, 13);
@@ -152,11 +160,19 @@
             // labelX
             // 
             this.labelX.AutoSize = true;
+            this.labelX.ForeColor = System.Drawing.SystemColors.WindowText;
             this.labelX.Location = new System.Drawing.Point(104, 15);
             this.labelX.Name = "labelX";
             this.labelX.Size = new System.Drawing.Size(14, 13);
             this.labelX.TabIndex = 2;
             this.labelX.Text = "X";
+            // 
+            // povBox2
+            // 
+            this.povBox2.Location = new System.Drawing.Point(215, 145);
+            this.povBox2.Name = "povBox2";
+            this.povBox2.Size = new System.Drawing.Size(190, 20);
+            this.povBox2.TabIndex = 1;
             // 
             // povBox1
             // 
@@ -228,13 +244,6 @@
             this.trackBarX.Size = new System.Drawing.Size(200, 45);
             this.trackBarX.TabIndex = 0;
             this.trackBarX.Value = 5;
-            // 
-            // povBox2
-            // 
-            this.povBox2.Location = new System.Drawing.Point(215, 145);
-            this.povBox2.Name = "povBox2";
-            this.povBox2.Size = new System.Drawing.Size(190, 20);
-            this.povBox2.TabIndex = 1;
             // 
             // JoyUC
             // 

@@ -13,4 +13,15 @@ public static class Statics
             s = s.Substring(0, index);
         return s;
     }
+
+    public static string ToStringInvariant(this int v)
+    {
+        return v.ToString(System.Globalization.CultureInfo.InvariantCulture);
+    }
+
+    static public string GetVersionString(this System.Reflection.Assembly aw)
+    {
+        System.Reflection.AssemblyName an = new System.Reflection.AssemblyName(aw.FullName);
+        return an.Version.Major.ToStringInvariant() + "." + an.Version.Minor.ToStringInvariant() + "." + an.Version.Build.ToStringInvariant() + "." + an.Version.Revision.ToStringInvariant();
+    }
 }

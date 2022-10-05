@@ -34,6 +34,8 @@ namespace JoystickTest
             InitializeComponent();
             this.Icon = Properties.Resources.joystick_icon;
             dinput = new DirectInput();
+
+            this.Text = this.Text + " " + System.Reflection.Assembly.GetExecutingAssembly().GetVersionString();
             Scan();
         }
 
@@ -43,6 +45,16 @@ namespace JoystickTest
             juc.Clear();
 
             int voff = 10;
+
+            {
+                var alllist = dinput.GetDevices(DeviceClass.All, DeviceEnumerationFlags.AttachedOnly);
+                foreach (var d in alllist)
+                {
+                    System.Diagnostics.Debug.WriteLine($"{d.ProductName.RemoveNuls()}");
+                }
+            }
+
+
             var devices = dinput.GetDevices(DeviceClass.GameControl, DeviceEnumerationFlags.AttachedOnly);
             nodevices = devices.Count;
 
@@ -106,5 +118,7 @@ namespace JoystickTest
 
             }
         }
+
+
     }
 }
