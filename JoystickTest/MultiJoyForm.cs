@@ -88,7 +88,7 @@ namespace JoystickTest
             }
 
             this.Size = new Size(controlswidth+50, Math.Min(1000,voff + 50));
-            t.Interval = 100;
+            t.Interval = 25;
             t.Tick += T_Tick;
             t.Start();
 
